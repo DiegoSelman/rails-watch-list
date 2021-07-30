@@ -1,13 +1,8 @@
 class ListsController < ApplicationController
-  before_action :set_list, only: [:show, :destroy]
+  before_action :set_find_list, only: %i[show edit update destroy]
 
   def index
     @lists = List.all
-  end
-
-  def show
-    @bookmark = Bookmark.new
-    @review = Review.new(list: @list)
   end
 
   def new
@@ -17,10 +12,22 @@ class ListsController < ApplicationController
   def create
     @list = List.new(list_params)
     if @list.save
-      redirect_to list_path(@list)
+      redirect_to list_path(@list.id)
     else
       render :new
     end
+  end
+
+  def show
+    @bookmark = Bookmark.new
+  end
+
+  def edit
+  end
+
+  def update
+    @list.update(list_params)
+    redirect_to list_params(@list.id)
   end
 
   def destroy
@@ -29,12 +36,11 @@ class ListsController < ApplicationController
   end
 
   private
-
-  def set_list
-    @list = List.find(params[:id])
+  def list_params
+    params.require(:list).permit(:name)
   end
 
-  def list_params
-    params.require(:list).permit(:name, :photo)
+  def set_find_list
+    @list = List.find(params[:id])
   end
 end
